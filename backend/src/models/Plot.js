@@ -5,6 +5,7 @@ const PlotSchema = new mongoose.Schema({
     xRange: String,
     yRange: String,
     plotTy: String,
+    plotTitle: String,
     url: String,
     createdAt: {
         type: Date,

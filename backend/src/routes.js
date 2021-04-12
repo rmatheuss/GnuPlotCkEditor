@@ -1,30 +1,36 @@
 const routes = require('express').Router();
-//const multer = require('multer');
 const crypto = require("crypto");
 
 const Plot = require('./models/Plot');
 
 routes.post("/plotGraph", async (req, res) => {
 
-    // let rangeX = '[-10:10]';
-    // let rangeY = '[-5:5]';
-    let rangeX = req.body.rX;
-    let rangeY = req.body.rY;
+    const { rX, rY, rTitle, rType, rKey } = req.body;
+
+    let plotTitle = "GoW (Gnuplot on Web)";
+    if (rTitle) {
+        plotTitle = "GoW (Gnuplot on Web) - " + rTitle.replace("GoW (Gnuplot on Web) - ", "");
+    }
 
     let fileExt = "png";
     let fileName = crypto.randomBytes(16).toString("hex");
-    // let fileName = "9165f34d28b85a8322c0684032d2c2f0";
+    if (rKey) fileName = rKey;
 
     var gnuplot = require('gnuplot');
-    gnuplot()
+
+    try {
+        gnuplot()
         .set(`term ${fileExt}`)
         .set(`output "${process.env.APP_FILES_PATH}${fileName}.${fileExt}"`)
-        .set('title "CKEditor GNUPlot"')
-        .set(`xrange ${rangeX}`)
-        .set(`yrange ${rangeY}`)
-        .set('zeroaxis')
-        .plot('(x/4)**2, sin(x), 1/x')
-        .end();
+        .set(`title "${plotTitle}"`)
+        .set(`wwxrange ${rX}`)
+        .set(`wwyrange ${rY}`)
+        .set('wwzeroaxis')
+        .plot('ww(x/4)**2, sin(x), 1/x')
+        .end();  
+    } catch (error) {
+        console.log(error);
+    }
 
     const query = {'key': fileName};
     const queryOptions = {
@@ -35,9 +41,10 @@ routes.post("/plotGraph", async (req, res) => {
 
     const plotObj = {
         key: fileName,
-        xRange: rangeX,
-        yRange: rangeY,
+        xRange: rX,
+        yRange: rY,
         plotTy: "Teste",
+        plotTitle: plotTitle,
         url: `${process.env.APP_URL}/files/${fileName}.${fileExt}`,
     };
     
@@ -49,18 +56,11 @@ routes.post("/plotGraph", async (req, res) => {
         }
         return res.json(doc);
     });
-    // const post = await Post.create({
-    //     key: fileName,
-    //     plotRange: "testeRange",
-    //     url: `${process.env.APP_URL}/files/${fileName}.${fileExt}`,
-    // });
-    // return res.json(post);
 });
 
 routes.post("/getPlotByKey", async (req, res) => {
 
     return res.json(await Plot.findOne({ key: req.body.key }).exec());
-    
 });
 
 module.exports = routes;
