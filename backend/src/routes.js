@@ -67,16 +67,16 @@ routes.post("/plotGraph", async (req, res) => {
         }
 
         p.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`);
+            // console.log(`stdout: ${data}`);
         });
 
         p.stderr.on('data', (data) => {
-            console.log(`stderr: ${data}`);
+            // console.log(`stderr: ${data}`);
             errors += `${data}`;
         });
 
         p.stderr.on('end', (data) => {
-            console.log("*******END");
+            // console.log("*******END");
         });
 
         
@@ -107,7 +107,7 @@ routes.post("/plotGraph", async (req, res) => {
                 await Plot.findOneAndUpdate(query, plotObj, queryOptions, 
                     (err, doc) => {
                     if (err) {
-                        console.log("Something wrong when updating data!");
+                        // console.log("Something wrong when updating data!");
                         return res.status(500).json({ 
                             error: "Erro ao plotar gráfico", 
                             detail: err 
