@@ -108,9 +108,12 @@ routes.post("/plotGraph", async (req, res) => {
                     (err, doc) => {
                     if (err) {
                         console.log("Something wrong when updating data!");
-                        return res.json(err);
+                        return res.status(500).json({ 
+                            error: "Erro ao plotar gráfico", 
+                            detail: err 
+                        });  
                     }
-                    return res.json(doc);
+                    return res.status(200).json(doc);
                 });
             }
         });
@@ -125,7 +128,7 @@ routes.post("/plotGraph", async (req, res) => {
 
 routes.post("/getPlotByKey", async (req, res) => {
 
-    return res.json(await Plot.findOne({ key: req.body.key }).exec());
+    return res.status(200).json(await Plot.findOne({ key: req.body.key }).exec());
 });
 
 module.exports = routes;
