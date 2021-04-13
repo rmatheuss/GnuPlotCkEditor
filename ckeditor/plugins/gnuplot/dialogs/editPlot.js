@@ -2,13 +2,13 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
     const ulrApi = "http://localhost:3000/plotGraph";
 
     return {
-        title: 'Gnuplot - Propriedades do gráfico',
+        title: 'GOW - Propriedades do gráfico',
         minWidth: 400,
         minHeight: 200,
         contents: [
             {
                 id: 'tab-plot-range',
-                label: 'Plot Tipo 1 - Range',
+                label: 'Plot de Gráfico',
                 elements: [
                     {
                         type: 'hbox',
@@ -16,37 +16,40 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
                         widths: [ '25%', '25%', '50%' ],
                         children: [
                             {
-                                label: 'Início X',
+                                label: 'Informe os valores de X separados por " <strong>:</strong> " <br> Ex: -10:20 ou 1:2:5.3:90',
                                 type: 'text',
                                 id: 'plotRangeStaRX',
-                                width: '40px',
+                                width: '300px',
                                 validate: CKEDITOR.dialog.validate.notEmpty("Informe um valor!"),
 
                                 setup: function( element ) {
                                     let xsta = "";
                                     try {
-                                        xsta = element.xRange.replace("[", "").replace("]", "").split(":")[0];
+                                        xsta = element.xRange.replace("[", "").replace("]", "");
                                     } catch (error) {
                                         console.log(error);
                                     }
                                     this.setValue(xsta);
                                 }
-                            },
+                            }
+                        ]
+                    },
+                    {
+                        type: 'hbox',
+                        id: 'plotFunctions',
+                        widths: [ '75%', '25%' ],
+                        children: [
                             {
-                                label: 'Fim X',
+                                label: 'Informe as funções separadas por " <strong>,</strong> " <br> Ex: (x/4)**2 ou sin(x), 1/x',
                                 type: 'text',
-                                id: 'plotRangeEndRX',
-                                width: '40px',
+                                id: 'plotFunctions',
+                                width: '75%',
                                 validate: CKEDITOR.dialog.validate.notEmpty("Informe um valor!"),
 
                                 setup: function( element ) {
-                                    let xend = "";
-                                    try {
-                                        xend = element.xRange.replace("[", "").replace("]", "").split(":")[1];
-                                    } catch (error) {
-                                        console.log(error);
+                                    if (element && element.plotFunctions) {
+                                        this.setValue(element.plotFunctions);                             
                                     }
-                                    this.setValue(xend);
                                 }
                             }
                         ]
@@ -57,11 +60,10 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
                         widths: [ '50%', '50%' ],
                         children: [
                             {
-                                label: 'Início Y',
+                                label: 'Início Y (Opcional)',
                                 type: 'text',
                                 id: 'plotRangeStaRY',
                                 width: '40px',
-                                validate: CKEDITOR.dialog.validate.notEmpty("Informe um valor!"),
 
                                 setup: function( element ) {
                                     let ysta = "";
@@ -74,11 +76,10 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
                                 }
                             },
                             {
-                                label: 'Fim Y',
+                                label: 'Fim Y (Opcional)',
                                 type: 'text',
                                 id: 'plotRangeEndRY',
                                 width: '40px',
-                                validate: CKEDITOR.dialog.validate.notEmpty("Informe um valor!"),
 
                                 setup: function( element ) {
                                     let yend = "";
@@ -120,17 +121,6 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
                         }
                     }
                 ]
-            },
-            {
-                id: 'tab-adv',
-                label: 'Tipo 2',
-                elements: [
-                    {
-                        type: 'text',
-                        id: 'id',
-                        label: 'Id'
-                    }
-                ]
             }
         ],
 
@@ -159,19 +149,19 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
         onOk: async function() {
             var dialog = this;
             const staRX = dialog.getValueOf('tab-plot-range', 'plotRangeStaRX');
-            const endRX = dialog.getValueOf('tab-plot-range', 'plotRangeEndRX');
             const staRY = dialog.getValueOf('tab-plot-range', 'plotRangeStaRY');
             const endRY = dialog.getValueOf('tab-plot-range', 'plotRangeEndRY');
             const plotTitle = dialog.getValueOf('tab-plot-range', 'plotRangeTitle');
             const plotKey = dialog.getValueOf('tab-plot-range', 'plotRangeKey');
+            const plotFunctions = dialog.getValueOf('tab-plot-range', 'plotFunctions');
 
             const dataToSend = JSON.stringify(
                     {
-                        "rKey": plotKey,
-                        "rX": `[${staRX}:${endRX}]`, 
-                        "rY": `[${staRY}:${endRY}]`,
-                        "rTitle": plotTitle,
-                        "rType": plotTitle,
+                        "pKey": plotKey,
+                        "pX": `[${staRX}]`, 
+                        "pY": `[${staRY}:${endRY}]`,
+                        "pTitle": plotTitle,
+                        "pFunctions": plotFunctions,
                     }
                 );
 
@@ -185,7 +175,7 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
 
             if (rawResponse.ok) {
                 if (content && content.url) {
-                    const { url, key, plotTitle, plotTy, xRange, yRange} = content;
+                    const { url, key, plotTitle, plotFunctions, xRange, yRange} = content;
     
                     setTimeout(function(){ 
                         let plotResult = editor.document.createElement('img');
