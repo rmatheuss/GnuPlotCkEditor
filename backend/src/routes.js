@@ -45,15 +45,26 @@ routes.post("/plotGraph", async (req, res) => {
 
     try {
         let errors = "";
-
         let p = plotar();
-        p.set(`term ${fileExt}`)
-        .set(`output "${process.env.APP_FILES_PATH}${fileName}.${fileExt}"`)
-        .set(`title "${plotTitle}"`)
-        .set(`xrange ${pX}`)
-        .set(`yrange ${pY}`)
-        .plot(pFunctions)
-        .end() 
+
+        if (pY)
+        {
+            p.set(`term ${fileExt}`)
+            .set(`output "${process.env.APP_FILES_PATH}${fileName}.${fileExt}"`)
+            .set(`title "${plotTitle}"`)
+            .set(`xrange ${pX}`)
+            .set(`yrange ${pY}`)
+            .plot(pFunctions)
+            .end() 
+        } 
+        else{
+            p.set(`term ${fileExt}`)
+            .set(`output "${process.env.APP_FILES_PATH}${fileName}.${fileExt}"`)
+            .set(`title "${plotTitle}"`)
+            .set(`xrange ${pX}`)
+            .plot(pFunctions)
+            .end() 
+        }
 
         p.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);

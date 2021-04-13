@@ -54,45 +54,45 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
                             }
                         ]
                     },
-                    {
-                        type: 'hbox',
-                        id: 'plotRangeY',
-                        widths: [ '50%', '50%' ],
-                        children: [
-                            {
-                                label: 'Início Y (Opcional)',
-                                type: 'text',
-                                id: 'plotRangeStaRY',
-                                width: '40px',
+                    // {
+                    //     type: 'hbox',
+                    //     id: 'plotRangeY',
+                    //     widths: [ '50%', '50%' ],
+                    //     children: [
+                    //         {
+                    //             label: 'Início Y (Opcional)',
+                    //             type: 'text',
+                    //             id: 'plotRangeStaRY',
+                    //             width: '40px',
 
-                                setup: function( element ) {
-                                    let ysta = "";
-                                    try {
-                                        ysta = element.yRange.replace("[", "").replace("]", "").split(":")[0];
-                                    } catch (error) {
-                                        console.log(error);
-                                    }
-                                    this.setValue(ysta);
-                                }
-                            },
-                            {
-                                label: 'Fim Y (Opcional)',
-                                type: 'text',
-                                id: 'plotRangeEndRY',
-                                width: '40px',
+                    //             setup: function( element ) {
+                    //                 let ysta = "";
+                    //                 try {
+                    //                     ysta = element.yRange.replace("[", "").replace("]", "").split(":")[0];
+                    //                 } catch (error) {
+                    //                     console.log(error);
+                    //                 }
+                    //                 this.setValue(ysta);
+                    //             }
+                    //         },
+                    //         {
+                    //             label: 'Fim Y (Opcional)',
+                    //             type: 'text',
+                    //             id: 'plotRangeEndRY',
+                    //             width: '40px',
 
-                                setup: function( element ) {
-                                    let yend = "";
-                                    try {
-                                        yend = element.yRange.replace("[", "").replace("]", "").split(":")[1];
-                                    } catch (error) {
-                                        console.log(error);
-                                    }
-                                    this.setValue(yend);
-                                }
-                            }
-                        ]
-                    },
+                    //             setup: function( element ) {
+                    //                 let yend = "";
+                    //                 try {
+                    //                     yend = element.yRange.replace("[", "").replace("]", "").split(":")[1];
+                    //                 } catch (error) {
+                    //                     console.log(error);
+                    //                 }
+                    //                 this.setValue(yend);
+                    //             }
+                    //         }
+                    //     ]
+                    // },
                     {
                         type: 'text',
                         id: 'plotRangeTitle',
@@ -149,8 +149,8 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
         onOk: async function() {
             var dialog = this;
             const staRX = dialog.getValueOf('tab-plot-range', 'plotRangeStaRX');
-            const staRY = dialog.getValueOf('tab-plot-range', 'plotRangeStaRY');
-            const endRY = dialog.getValueOf('tab-plot-range', 'plotRangeEndRY');
+            // const staRY = dialog.getValueOf('tab-plot-range', 'plotRangeStaRY');
+            // const endRY = dialog.getValueOf('tab-plot-range', 'plotRangeEndRY');
             const plotTitle = dialog.getValueOf('tab-plot-range', 'plotRangeTitle');
             const plotKey = dialog.getValueOf('tab-plot-range', 'plotRangeKey');
             const plotFunctions = dialog.getValueOf('tab-plot-range', 'plotFunctions');
@@ -159,7 +159,8 @@ CKEDITOR.dialog.add( 'editPlotDialog', function ( editor ) {
                     {
                         "pKey": plotKey,
                         "pX": `[${staRX}]`, 
-                        "pY": `[${staRY}:${endRY}]`,
+                        // "pY": `[${staRY}:${endRY}]`,
+                        "pY": ``,
                         "pTitle": plotTitle,
                         "pFunctions": plotFunctions,
                     }
