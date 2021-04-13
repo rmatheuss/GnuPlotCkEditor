@@ -1,9 +1,8 @@
 const request = require('supertest');
-
 const app = require('../../src/app');
 
 describe('Plotagem', () => {
-    it('retorna um JSON com informações do gráfico plotado, uma vez que sejam passados parâmetros válidos de função e intervalo de X', 
+    it('retorna um JSON com informações do gráfico plotado, uma vez que sejam passados parâmetros válidos de função e válidos de intervalo de X', 
     async () => {
         const param = 
             {
@@ -57,7 +56,7 @@ describe('Plotagem', () => {
         expect(response.status).toBe(500);
     });
 
-    it('retorna um JSON com informações de erro, uma vez que sejam passados parâmetros válidos de função e inválidos de intervalo de X', 
+    it('retorna um JSON com informações de erro, uma vez que sejam passados parâmetros inválidos de função e inválidos de intervalo de X', 
     async () => {
         const param = 
             {
@@ -75,7 +74,7 @@ describe('Plotagem', () => {
         expect(response.status).toBe(500);
     });
 
-    it('retorna um JSON com informações de erro, uma vez que não sejam passados parâmetros função e intervalo de X', 
+    it('retorna um JSON com informações de erro, uma vez que não sejam passados parâmetros de função e de intervalo de X', 
     async () => {
         const param = 
             {
@@ -92,7 +91,7 @@ describe('Plotagem', () => {
     });
 
 
-    it('retorna um JSON com informações do gráfico editado, uma vez que seja passado como parâmetro uma chave de gráfico já plotado anteriormente', 
+    it('retorna um JSON com informações do gráfico editado, uma vez que sejam passados parâmetros válidos de função, válidos de intervalo de X e uma chave de gráfico plotado anteriormente', 
     async () => {
         const param = 
             {
