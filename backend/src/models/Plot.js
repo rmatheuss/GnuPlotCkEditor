@@ -4,7 +4,7 @@ const PlotSchema = new mongoose.Schema({
     key: String, 
     xRange: String,
     yRange: String,
-    plotTy: String,
+    plotFunctions: String,
     plotTitle: String,
     url: String,
     createdAt: {

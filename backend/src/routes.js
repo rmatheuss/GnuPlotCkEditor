@@ -3,59 +3,113 @@ const crypto = require("crypto");
 
 const Plot = require('./models/Plot');
 
+plotar = () => {
+    var run = require('comandante')
+    var plot = run('gnuplot', []);
+
+    plot.print = function (data, options) {
+        plot.write(data);
+        if (options && options.end) {
+            plot.end();
+        }
+        return plot;
+    };
+
+    plot.println = function (data, options) {
+        return plot.print(data + '\n', options);
+    };
+
+    ['set', 'unset', 'plot', 'splot', 'replot'].forEach(function (name) {
+        plot[name] = function (data, options) {
+            if (data) {
+                return plot.println(name + ' ' + data, options);                
+            }
+            return plot.println(name, options);                
+        };
+    });
+    return plot;
+}
+
 routes.post("/plotGraph", async (req, res) => {
 
-    const { rX, rY, rTitle, rType, rKey } = req.body;
+    const { pX, pY, pTitle, pFunctions, pKey } = req.body;
 
     let plotTitle = "GoW (Gnuplot on Web)";
-    if (rTitle) {
-        plotTitle = "GoW (Gnuplot on Web) - " + rTitle.replace("GoW (Gnuplot on Web) - ", "");
+    if (pTitle) {
+        plotTitle = "GoW (Gnuplot on Web) - " + pTitle.replace("GoW (Gnuplot on Web) - ", "");
     }
 
     let fileExt = "png";
     let fileName = crypto.randomBytes(16).toString("hex");
-    if (rKey) fileName = rKey;
-
-    var gnuplot = require('gnuplot');
+    if (pKey) fileName = pKey;
 
     try {
-        gnuplot()
-        .set(`term ${fileExt}`)
+        let errors = "";
+
+        let p = plotar();
+        p.set(`term ${fileExt}`)
         .set(`output "${process.env.APP_FILES_PATH}${fileName}.${fileExt}"`)
         .set(`title "${plotTitle}"`)
-        .set(`wwxrange ${rX}`)
-        .set(`wwyrange ${rY}`)
-        .set('wwzeroaxis')
-        .plot('ww(x/4)**2, sin(x), 1/x')
-        .end();  
-    } catch (error) {
-        console.log(error);
+        .set(`xrange ${pX}`)
+        .set(`yrange ${pY}`)
+        .plot(pFunctions)
+        .end() 
+
+        p.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+
+        p.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+            errors += `${data}`;
+        });
+
+        p.stderr.on('end', (data) => {
+            console.log("*******END");
+        });
+
+        
+        p.on('exit', async (code) => {
+            if (errors) {
+                return res.status(500).json({ 
+                    error: "Erro ao plotar gráfico", 
+                    detail: errors 
+                });  
+            }
+            else {
+                const query = {'key': fileName};
+                const queryOptions = {
+                    upsert: true,
+                    setDefaultsOnInsert: true,
+                    new: true,
+                };
+
+                const plotObj = {
+                    key: fileName,
+                    xRange: pX,
+                    yRange: pY,
+                    plotFunctions: pFunctions,
+                    plotTitle: plotTitle,
+                    url: `${process.env.APP_URL}/files/${fileName}.${fileExt}`,
+                };
+                
+                await Plot.findOneAndUpdate(query, plotObj, queryOptions, 
+                    (err, doc) => {
+                    if (err) {
+                        console.log("Something wrong when updating data!");
+                        return res.json(err);
+                    }
+                    return res.json(doc);
+                });
+            }
+        });
+       
+    } catch (err) {
+        return res.status(500).json({ 
+                                    error: "Erro ao plotar gráfico", 
+                                    detail: err 
+                                });    
     }
-
-    const query = {'key': fileName};
-    const queryOptions = {
-        upsert: true,
-        setDefaultsOnInsert: true,
-        new: true,
-    };
-
-    const plotObj = {
-        key: fileName,
-        xRange: rX,
-        yRange: rY,
-        plotTy: "Teste",
-        plotTitle: plotTitle,
-        url: `${process.env.APP_URL}/files/${fileName}.${fileExt}`,
-    };
-    
-    await Plot.findOneAndUpdate(query, plotObj, queryOptions, 
-        (err, doc) => {
-        if (err) {
-            console.log("Something wrong when updating data!");
-            return res.json(err);
-        }
-        return res.json(doc);
-    });
 });
 
 routes.post("/getPlotByKey", async (req, res) => {

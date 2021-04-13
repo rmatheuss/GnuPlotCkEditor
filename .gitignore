@@ -4,3 +4,11 @@ node_modules
 
 backend/tmp/uploads/*
 !backend/tmp/uploads/.gitkeep
+
+!ckeditor/
+
+ckeditor/*
+!ckeditor/plugins/
+
+ckeditor/plugins/*
+!ckeditor/plugins/gnuplot/
