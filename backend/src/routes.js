@@ -3,6 +3,9 @@ const crypto = require("crypto");
 
 const Plot = require('./models/Plot');
 
+//Baseado no código do davvo/node-gnuplot
+//Conforme endereço abaixo
+//https://github.com/davvo/node-gnuplot
 plotar = () => {
     var run = require('comandante')
     var plot = run('gnuplot', []);
@@ -31,7 +34,6 @@ plotar = () => {
 }
 
 routes.post("/plotGraph", async (req, res) => {
-
     const { pX, pY, pTitle, pFunctions, pKey } = req.body;
 
     let plotTitle = "GoW (Gnuplot on Web)";
@@ -66,20 +68,8 @@ routes.post("/plotGraph", async (req, res) => {
             .end() 
         }
 
-        p.stdout.on('data', (data) => {
-            // console.log(`stdout: ${data}`);
-        });
-
-        p.stderr.on('data', (data) => {
-            // console.log(`stderr: ${data}`);
-            errors += `${data}`;
-        });
-
-        p.stderr.on('end', (data) => {
-            // console.log("*******END");
-        });
-
-        
+        p.stderr.on('data', (data) => { errors += `${data}`; });
+    
         p.on('exit', async (code) => {
             if (errors) {
                 return res.status(500).json({ 
